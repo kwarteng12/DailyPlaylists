@@ -1,8 +1,8 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
+  timeout: 60000, // Set the global timeout for all tests (in milliseconds)
   use: {
-    // Browser and context options here
+    headless: true,
   },
-  // Additional configuration options
 });
