@@ -22,9 +22,15 @@ test.describe('10 Premium Credits Purchase Flow', () => {
       console.log("Purchasing 10 Premium Credits...");
       await buyCredits(page);
 
-      // Step 3: Validate that credits have increased
-      console.log("Re-fetching premium credits...");
-      const updatedCredits = await landOnWalletPage(page, email, password);
+      // Step 3: Wait for the page to settle after refresh (no need to click "Continue" again)
+      console.log("Refreshing the page to get the updated credits...");
+      await page.reload();
+      console.log("Waiting for the updated credits...");
+      await page.waitForSelector('div.Text-vnjkjx-0.fucgei', { state: 'visible' });
+
+      // Get the updated premium credits directly from the page
+      const updatedCreditsText = await page.textContent('div.Text-vnjkjx-0.fucgei');
+      const updatedCredits = parseInt(updatedCreditsText?.trim() || "0");
       console.log(`Updated premium credits: ${updatedCredits}`);
 
       // Check if the credits increased by 10
