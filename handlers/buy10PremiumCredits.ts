@@ -18,17 +18,27 @@ export async function landOnWalletPage(
 
   console.log("Successfully logged in.");
 
-  // Handle pop-ups
-  const popupCloseButtonSelector =
-    'svg[class="Icon__SvgStyled-j3bzl8-0 lgtvED"] use[href$="#x-light"]';
-  for (let i = 0; i < 2; i++) {
-    const popUpVisible = await page.isVisible(popupCloseButtonSelector);
-    if (popUpVisible) {
-      await page.click(popupCloseButtonSelector, { force: true });
-      console.log(`Closed pop-up ${i + 1}.`);
-      await page.waitForTimeout(1000);
-    } else {
-      console.log(`Pop-up ${i + 1} not found. Continuing...`);
+  const popupCloseButtonSelectors = [
+    'svg[class="Icon__SvgStyled-j3bzl8-0 lgtvED"] use[href$="#x-light"]', // First pop-up selector
+    'svg.Icon__SvgStyled-j3bzl8-0.hgbHlU use[href$="#close"]' // Second pop-up selector
+  ];
+  
+  let popUpCount = 0;
+  
+  while (popUpCount < popupCloseButtonSelectors.length) {
+    try {
+      const selector = popupCloseButtonSelectors[popUpCount];
+      console.log(`Checking for pop-up ${popUpCount + 1} with selector: ${selector}...`);
+  
+      // Wait for the current pop-up to be visible
+      await page.waitForSelector(selector, { state: 'visible', timeout: 5000 });
+      await page.click(selector); // Click the close button for the current pop-up
+      console.log(`Closed pop-up ${popUpCount + 1}.`);
+  
+      popUpCount++;
+      await page.waitForTimeout(1000); // Small delay between pop-up closures
+    } catch (error) {
+      console.log(`Pop-up ${popUpCount + 1} not found or already closed.`);
       break;
     }
   }
@@ -45,14 +55,22 @@ export async function landOnWalletPage(
     console.log("No cookie consent banner found.");
   }
 
-  // Click on the dropdown menu button
-  const dropdownButtonSelector = "div.UserImage__ImageButton-sc-1dewlsi-0.dDkfMd";
-  console.log("Waiting for the dropdown button to be visible...");
-  await page.waitForSelector(dropdownButtonSelector, { state: "visible", timeout: 10000 });
-  await page.click(dropdownButtonSelector, { force: true });
+  // // Click on the dropdown menu button
+  // const dropdownButtonSelector = "div.UserImage__ImageButton-sc-1dewlsi-0.dDkfMd";
+  // console.log("Waiting for the dropdown button to be visible...");
+  // await page.waitForSelector(dropdownButtonSelector, { state: "visible", timeout: 10000 });
+  // await page.click(dropdownButtonSelector, { force: true });
 
-  console.log("Waiting for 3 seconds...");
-  await page.waitForTimeout(3000);
+ 
+
+
+const dropdownMenuSelector = 'div.styles__Wrapper-sc-1l5cdf5-0.TevDT'; // Parent wrapper
+console.log("Clicking the dropdown menu...");
+await page.waitForSelector(dropdownMenuSelector, { state: "visible", timeout: 10000 });
+await page.click(dropdownMenuSelector);
+
+console.log("Waiting for 1 second...");
+await page.waitForTimeout(1000);
 
   // Click on the Wallet button
   const walletButtonSelector = 'a[href="/wallet"]';
@@ -60,7 +78,7 @@ export async function landOnWalletPage(
   await page.waitForSelector(walletButtonSelector, { state: "visible", timeout: 10000 });
   await page.click(walletButtonSelector, { force: true });
 
-  console.log("Waiting for 2 seconds after clicking Wallet...");
+  console.log("Waiting after clicking Wallet...");
   await page.waitForTimeout(700);
 
   // Get the current number of premium credits

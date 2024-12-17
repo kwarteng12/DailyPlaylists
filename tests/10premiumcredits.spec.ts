@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { landOnWalletPage, buyCredits } from '../handlers/buy10PremiumCredits';
 
 test.describe('10 Premium Credits Purchase Flow', () => {
-  const email = 'nana+10@dailyplaylists.com';
+  const email = 'nana+15@dailyplaylists.com';
   const password = 'Kduffour12$';
 
   test('User buys 10 Premium Credits', async ({ page }) => {
@@ -22,15 +22,17 @@ test.describe('10 Premium Credits Purchase Flow', () => {
       console.log("Purchasing 10 Premium Credits...");
       await buyCredits(page);
 
-      // Step 3: Wait for the page to settle after refresh (no need to click "Continue" again)
+      // Step 3: Reload page to fetch updated credits
       console.log("Refreshing the page to get the updated credits...");
       await page.reload();
-      console.log("Waiting for the updated credits...");
-      await page.waitForSelector('div.Text-vnjkjx-0.fucgei', { state: 'visible' });
 
-      // Get the updated premium credits directly from the page
-      const updatedCreditsText = await page.textContent('div.Text-vnjkjx-0.fucgei');
+      // Wait for updated premium credits to appear
+      const premiumCreditsSelector = 'div.Text-vnjkjx-0.fucgei';
+      await page.waitForSelector(premiumCreditsSelector, { state: 'visible', timeout: 10000 });
+
+      const updatedCreditsText = await page.textContent(premiumCreditsSelector);
       const updatedCredits = parseInt(updatedCreditsText?.trim() || "0");
+
       console.log(`Updated premium credits: ${updatedCredits}`);
 
       // Check if the credits increased by 10
@@ -42,7 +44,7 @@ test.describe('10 Premium Credits Purchase Flow', () => {
       } else {
         console.error("An unexpected error occurred");
       }
-      throw error; // Rethrow to ensure the test fails in Playwright
+      throw error; // Ensure the test fails in Playwright
     }
   });
 });
