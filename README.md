@@ -34,3 +34,21 @@ Test Overview
 
 Valid Login Test: Ensures login succeeds with correct credentials.
 Invalid Login Test: Confirms login fails with incorrect credentials.
+
+
+
+HOW TO RUN EACH TESTS.
+
+I would advice you run each test in isolation and not all at once.
+
+You could obviously just run **npx playwright test** command but there would possibly be a timeout.
+
+1. For standard Song Submission test run the command below:
+npx playwright test tests/standardsong.spec.ts --headed  
+
+2. For 10 premium credits purchase test run the command below:
+npx playwright test tests/10premiumcredits.spec.ts --headed
+
+Note: --headed command is used to run tests with a visible browser window. By default, Playwright runs browsers in "headless" mode, meaning the browser runs in the background without displaying a UI.
+
+  
